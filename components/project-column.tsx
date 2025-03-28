@@ -6,33 +6,53 @@ import { useState } from "react"
 import { Draggable, Droppable } from "@hello-pangea/dnd"
 import { MoreHorizontal, Plus, Trash2 } from "lucide-react"
 
-import { Card } from "./card"
-import type { ColumnType } from "./kanban-board"
+import { ProjectCard } from "./project-card"
+import type { ProjectColumnType } from "./kanban-board"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-interface ColumnProps {
-  column: ColumnType
+interface ProjectColumnProps {
+  column: ProjectColumnType
   index: number
   updateColumnTitle: (columnId: string, newTitle: string) => void
   deleteColumn: (columnId: string) => void
-  addCard: (columnId: string, content: string, description?: string) => void
-  updateCard: (columnId: string, cardId: string, content: string, description?: string) => void
-  deleteCard: (columnId: string, cardId: string) => void
+  addProjectCard: (columnId: string, content: string, description?: string) => void
+  updateProjectCard: (columnId: string, cardId: string, content: string, description?: string) => void
+  deleteProjectCard: (columnId: string, cardId: string) => void
+  toggleProjectExpansion: (columnId: string, cardId: string) => void
+  addTaskColumn: (projectId: string, title: string) => void
+  updateTaskColumnTitle: (projectId: string, taskColumnId: string, newTitle: string) => void
+  deleteTaskColumn: (projectId: string, taskColumnId: string) => void
+  addTaskCard: (projectId: string, taskColumnId: string, content: string, description?: string) => void
+  updateTaskCard: (
+    projectId: string,
+    taskColumnId: string,
+    taskCardId: string,
+    content: string,
+    description?: string,
+  ) => void
+  deleteTaskCard: (projectId: string, taskColumnId: string, taskCardId: string) => void
 }
 
-export function Column({
+export function ProjectColumn({
   column,
   index,
   updateColumnTitle,
   deleteColumn,
-  addCard,
-  updateCard,
-  deleteCard,
-}: ColumnProps) {
+  addProjectCard,
+  updateProjectCard,
+  deleteProjectCard,
+  toggleProjectExpansion,
+  addTaskColumn,
+  updateTaskColumnTitle,
+  deleteTaskColumn,
+  addTaskCard,
+  updateTaskCard,
+  deleteTaskCard,
+}: ProjectColumnProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [columnTitle, setColumnTitle] = useState(column.title)
   const [isAddCardOpen, setIsAddCardOpen] = useState(false)
@@ -66,7 +86,7 @@ export function Column({
   const handleAddCard = () => {
     if (!newCardContent.trim()) return
 
-    addCard(column.id, newCardContent, newCardDescription)
+    addProjectCard(column.id, newCardContent, newCardDescription)
     setNewCardContent("")
     setNewCardDescription("")
     setIsAddCardOpen(false)
@@ -121,13 +141,20 @@ export function Column({
                 {...provided.droppableProps}
               >
                 {column.cards.map((card, index) => (
-                  <Card
+                  <ProjectCard
                     key={card.id}
                     card={card}
                     index={index}
                     columnId={column.id}
-                    updateCard={updateCard}
-                    deleteCard={deleteCard}
+                    updateProjectCard={updateProjectCard}
+                    deleteProjectCard={deleteProjectCard}
+                    toggleProjectExpansion={toggleProjectExpansion}
+                    addTaskColumn={addTaskColumn}
+                    updateTaskColumnTitle={updateTaskColumnTitle}
+                    deleteTaskColumn={deleteTaskColumn}
+                    addTaskCard={addTaskCard}
+                    updateTaskCard={updateTaskCard}
+                    deleteTaskCard={deleteTaskCard}
                   />
                 ))}
                 {provided.placeholder}
@@ -138,17 +165,17 @@ export function Column({
           <Dialog open={isAddCardOpen} onOpenChange={setIsAddCardOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" className="flex m-2 text-muted-foreground justify-start">
-                <Plus className="mr-2 h-4 w-4" /> Add Card
+                <Plus className="mr-2 h-4 w-4" /> Add Project
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Card</DialogTitle>
+                <DialogTitle>Add New Project</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-2">
                 <div className="space-y-2">
                   <Input
-                    placeholder="Card Title"
+                    placeholder="Project Title"
                     value={newCardContent}
                     onChange={(e) => setNewCardContent(e.target.value)}
                   />
@@ -162,7 +189,7 @@ export function Column({
                   />
                 </div>
                 <Button onClick={handleAddCard} className="w-full">
-                  Add Card
+                  Add Project
                 </Button>
               </div>
             </DialogContent>

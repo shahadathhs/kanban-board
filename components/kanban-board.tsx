@@ -34,33 +34,29 @@ const initialData: BoardType = {
       id: "column-1",
       title: "To Do",
       cards: [
-        { id: "card-1", content: "Create project plan", description: "Outline the project scope and timeline" },
-        { id: "card-2", content: "Design wireframes", description: "Create initial wireframes for the application" },
         {
-          id: "card-3",
-          content: "Set up development environment",
-          description: "Install necessary tools and dependencies",
+          id: "card-1",
+          content: "Create project plan",
+          description: "Define project scope, timeline, and deliverables",
         },
+        { id: "card-2", content: "Design wireframes", description: "Create initial wireframes for the main pages" },
+        { id: "card-3", content: "Research competitors", description: "Analyze similar products in the market" },
       ],
     },
     {
       id: "column-2",
       title: "In Progress",
       cards: [
-        {
-          id: "card-4",
-          content: "Implement authentication",
-          description: "Add user login and registration functionality",
-        },
-        { id: "card-5", content: "Create database schema", description: "Design and implement the database structure" },
+        { id: "card-4", content: "Implement authentication", description: "Set up user login and registration" },
+        { id: "card-5", content: "Create database schema", description: "Design the database structure" },
       ],
     },
     {
       id: "column-3",
       title: "Done",
       cards: [
-        { id: "card-6", content: "Project kickoff", description: "Initial meeting with stakeholders" },
-        { id: "card-7", content: "Requirements gathering", description: "Collect and document project requirements" },
+        { id: "card-6", content: "Project setup", description: "Initialize repository and project structure" },
+        { id: "card-7", content: "Requirements gathering", description: "Collect and document requirements" },
       ],
     },
   ],
@@ -71,10 +67,40 @@ const loadBoardData = (): BoardType => {
   if (typeof window !== "undefined") {
     const savedData = localStorage.getItem("kanbanBoard")
     if (savedData) {
-      return JSON.parse(savedData)
+      try {
+        return JSON.parse(savedData)
+      } catch (e) {
+        console.error("Failed to parse saved data:", e)
+      }
     }
   }
   return initialData
+}
+
+export type ProjectCardType = {
+  id: string
+  content: string
+  description?: string
+  isExpanded: boolean
+  taskColumns: TaskColumnType[]
+}
+
+export type ProjectColumnType = {
+  id: string
+  title: string
+  cards: ProjectCardType[]
+}
+
+export type TaskCardType = {
+  id: string
+  content: string
+  description?: string
+}
+
+export type TaskColumnType = {
+  id: string
+  title: string
+  cards: TaskCardType[]
 }
 
 export function KanbanBoard() {
