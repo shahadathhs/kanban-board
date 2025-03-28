@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Draggable } from "@hello-pangea/dnd"
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 
-import { CardType, KanbanBoard } from "./kanban-board"
+import { CardType } from "./kanban-board"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
