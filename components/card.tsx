@@ -1,67 +1,60 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Draggable } from "@hello-pangea/dnd";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react"
+import { Draggable } from "@hello-pangea/dnd"
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 
-import { CardType } from "./kanban-board";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { CardType } from "./kanban-board"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { TaskBoard } from "./task-board"
 
 interface CardProps {
-  card: CardType;
-  index: number;
-  columnId: string;
-  updateCard: (
-    columnId: string,
-    cardId: string,
-    content: string,
-    description?: string
-  ) => void;
-  deleteCard: (columnId: string, cardId: string) => void;
+  card: CardType & { taskColumns?: TaskColumnType[] } // optionally extend card with taskColumns
+  index: number
+  columnId: string
+  updateCard: (columnId: string, cardId: string, content: string, description?: string) => void
+  deleteCard: (columnId: string, cardId: string) => void
 }
 
-export function Card({
-  card,
-  index,
-  columnId,
-  updateCard,
-  deleteCard,
-}: CardProps) {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editContent, setEditContent] = useState(card.content);
-  const [editDescription, setEditDescription] = useState(
-    card.description || ""
-  );
+// Define types for nested tasks (if not defined elsewhere)
+export type TaskCardType = {
+  id: string
+  content: string
+  description?: string
+}
+
+export type TaskColumnType = {
+  id: string
+  title: string
+  cards: TaskCardType[]
+}
+
+export function Card({ card, index, columnId, updateCard, deleteCard }: CardProps) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editContent, setEditContent] = useState(card.content)
+  const [editDescription, setEditDescription] = useState(card.description || "")
+  // State to toggle display of nested task board
+  const [showTaskBoard, setShowTaskBoard] = useState(false)
 
   const handleSaveEdit = () => {
-    if (!editContent.trim()) return;
-    updateCard(columnId, card.id, editContent, editDescription);
-    setIsEditDialogOpen(false);
-  };
+    if (!editContent.trim()) return
+    updateCard(columnId, card.id, editContent, editDescription)
+    setIsEditDialogOpen(false)
+  }
 
   const handleDelete = () => {
-    deleteCard(columnId, card.id);
-  };
+    deleteCard(columnId, card.id)
+  }
 
   const openEditDialog = () => {
-    setEditContent(card.content);
-    setEditDescription(card.description || "");
-    setIsEditDialogOpen(true);
-  };
+    setEditContent(card.content)
+    setEditDescription(card.description || "")
+    setIsEditDialogOpen(true)
+  }
 
   return (
     <>
@@ -75,11 +68,11 @@ export function Card({
               snapshot.isDragging ? "opacity-70 shadow-md" : ""
             }`}
           >
-            {/* Card content click opens modal */}
             <div className="flex justify-between items-start">
+              {/* Card main content is clickable to open the edit modal */}
               <div
                 className="flex-1 mr-2 cursor-pointer"
-                onClick={openEditDialog} // Open modal when clicking on the card
+                onClick={openEditDialog}
               >
                 <h3 className="font-medium text-sm">{card.content}</h3>
                 {card.description && (
@@ -89,14 +82,14 @@ export function Card({
                 )}
               </div>
 
-              {/* Dropdown menu should not trigger modal */}
+              {/* Dropdown menu with stopPropagation */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0"
-                    onClick={(e) => e.stopPropagation()} // Prevent modal opening when clicking on menu
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
@@ -106,21 +99,32 @@ export function Card({
                     <Pencil className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={handleDelete}
-                  >
+                  <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+
+            {/* Button to toggle nested task board */}
+            <div className="mt-2">
+              <Button variant="outline" size="sm" onClick={() => setShowTaskBoard(!showTaskBoard)}>
+                {showTaskBoard ? "Hide Tasks" : "Add Task"}
+              </Button>
+            </div>
+
+            {/* Nested task board - rendered if showTaskBoard is true */}
+            {showTaskBoard && (
+              <div className="mt-4 border-t pt-2">
+                <TaskBoard />
+              </div>
+            )}
           </div>
         )}
       </Draggable>
 
-      {/* Modal for editing card */}
+      {/* Edit modal dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -128,11 +132,7 @@ export function Card({
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Input
-                placeholder="Card Title"
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-              />
+              <Input placeholder="Card Title" value={editContent} onChange={(e) => setEditContent(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Textarea
@@ -149,5 +149,5 @@ export function Card({
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }
