@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
 
-import { Card } from "./card";
+import { Card } from "./project-card";
 import type { ColumnType } from "./project-board";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
