@@ -1,27 +1,43 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Draggable, Droppable } from "@hello-pangea/dnd"
-import { MoreHorizontal, Plus, Trash2 } from "lucide-react"
+import { useState } from "react";
+import { Draggable, Droppable } from "@hello-pangea/dnd";
+import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
 
-import { Card } from "./card"
-import type { ColumnType } from "./kanban-board"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Card } from "./card";
+import type { ColumnType } from "./project-board";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ColumnProps {
-  column: ColumnType
-  index: number
-  updateColumnTitle: (columnId: string, newTitle: string) => void
-  deleteColumn: (columnId: string) => void
-  addCard: (columnId: string, content: string, description?: string) => void
-  updateCard: (columnId: string, cardId: string, content: string, description?: string) => void
-  deleteCard: (columnId: string, cardId: string) => void
+  column: ColumnType;
+  index: number;
+  updateColumnTitle: (columnId: string, newTitle: string) => void;
+  deleteColumn: (columnId: string) => void;
+  addCard: (columnId: string, content: string, description?: string) => void;
+  updateCard: (
+    columnId: string,
+    cardId: string,
+    content: string,
+    description?: string
+  ) => void;
+  deleteCard: (columnId: string, cardId: string) => void;
 }
 
 export function Column({
@@ -33,44 +49,44 @@ export function Column({
   updateCard,
   deleteCard,
 }: ColumnProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [columnTitle, setColumnTitle] = useState(column.title)
-  const [isAddCardOpen, setIsAddCardOpen] = useState(false)
-  const [newCardContent, setNewCardContent] = useState("")
-  const [newCardDescription, setNewCardDescription] = useState("")
+  const [isEditing, setIsEditing] = useState(false);
+  const [columnTitle, setColumnTitle] = useState(column.title);
+  const [isAddCardOpen, setIsAddCardOpen] = useState(false);
+  const [newCardContent, setNewCardContent] = useState("");
+  const [newCardDescription, setNewCardDescription] = useState("");
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setColumnTitle(e.target.value)
-  }
+    setColumnTitle(e.target.value);
+  };
 
   const handleTitleBlur = () => {
     if (columnTitle.trim()) {
-      updateColumnTitle(column.id, columnTitle)
+      updateColumnTitle(column.id, columnTitle);
     } else {
-      setColumnTitle(column.title) // Reset to original if empty
+      setColumnTitle(column.title); // Reset to original if empty
     }
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       if (columnTitle.trim()) {
-        updateColumnTitle(column.id, columnTitle)
+        updateColumnTitle(column.id, columnTitle);
       } else {
-        setColumnTitle(column.title) // Reset to original if empty
+        setColumnTitle(column.title); // Reset to original if empty
       }
-      setIsEditing(false)
+      setIsEditing(false);
     }
-  }
+  };
 
   const handleAddCard = () => {
-    if (!newCardContent.trim()) return
+    if (!newCardContent.trim()) return;
 
-    addCard(column.id, newCardContent, newCardDescription)
-    setNewCardContent("")
-    setNewCardDescription("")
-    setIsAddCardOpen(false)
-  }
+    addCard(column.id, newCardContent, newCardDescription);
+    setNewCardContent("");
+    setNewCardDescription("");
+    setIsAddCardOpen(false);
+  };
 
   return (
     <Draggable draggableId={column.id} index={index}>
@@ -80,7 +96,10 @@ export function Column({
           {...provided.draggableProps}
           ref={provided.innerRef}
         >
-          <div className="p-3 font-medium flex items-center justify-between" {...provided.dragHandleProps}>
+          <div
+            className="p-3 font-medium flex items-center justify-between"
+            {...provided.dragHandleProps}
+          >
             {isEditing ? (
               <Input
                 value={columnTitle}
@@ -91,7 +110,10 @@ export function Column({
                 autoFocus
               />
             ) : (
-              <div className="text-sm font-semibold truncate cursor-pointer" onClick={() => setIsEditing(true)}>
+              <div
+                className="text-sm font-semibold truncate cursor-pointer"
+                onClick={() => setIsEditing(true)}
+              >
                 {column.title} ({column.cards.length})
               </div>
             )}
@@ -102,8 +124,13 @@ export function Column({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setIsEditing(true)}>Rename</DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600" onClick={() => deleteColumn(column.id)}>
+                <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={() => deleteColumn(column.id)}
+                >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
                 </DropdownMenuItem>
@@ -115,7 +142,9 @@ export function Column({
             {(provided, snapshot) => (
               <div
                 className={`flex-grow overflow-y-auto p-2 ${
-                  snapshot.isDraggingOver ? "bg-slate-200 dark:bg-slate-700" : ""
+                  snapshot.isDraggingOver
+                    ? "bg-slate-200 dark:bg-slate-700"
+                    : ""
                 }`}
                 ref={provided.innerRef}
                 {...provided.droppableProps}
@@ -137,7 +166,10 @@ export function Column({
 
           <Dialog open={isAddCardOpen} onOpenChange={setIsAddCardOpen}>
             <DialogTrigger asChild>
-              <Button variant="ghost" className="flex m-2 text-muted-foreground justify-start">
+              <Button
+                variant="ghost"
+                className="flex m-2 text-muted-foreground justify-start"
+              >
                 <Plus className="mr-2 h-4 w-4" /> Add Card
               </Button>
             </DialogTrigger>
@@ -170,6 +202,5 @@ export function Column({
         </div>
       )}
     </Draggable>
-  )
+  );
 }
-

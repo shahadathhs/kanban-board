@@ -1,5 +1,4 @@
-import { KanbanBoard } from "@/components/kanban-board";
-import { ProjectKanbanBoard } from "@/components/ProjectKanbanBoard";
+import { ProjectBoard } from "@/components/project-board";
 
 export default function Home() {
   return (
@@ -8,8 +7,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold mb-8 text-slate-900 dark:text-slate-50">
           Multi-Level Kanban Board
         </h1>
-        {/* <KanbanBoard /> */}
-        <ProjectKanbanBoard />
+        <ProjectBoard />
       </div>
     </div>
   );

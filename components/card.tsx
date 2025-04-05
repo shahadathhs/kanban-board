@@ -1,60 +1,83 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Draggable } from "@hello-pangea/dnd"
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { useState } from "react";
+import { Draggable } from "@hello-pangea/dnd";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
-import { CardType } from "./kanban-board"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { TaskBoard } from "./task-board"
+import { CardType } from "./project-board";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { TaskBoard } from "./task-board";
 
 // Define types for nested tasks
 export type TaskCardType = {
-  id: string
-  content: string
-  description?: string
-}
+  id: string;
+  content: string;
+  description?: string;
+};
 
 export type TaskColumnType = {
-  id: string
-  title: string
-  cards: TaskCardType[]
-}
+  id: string;
+  title: string;
+  cards: TaskCardType[];
+};
 
 interface CardProps {
-  card: CardType & { taskColumns?: TaskColumnType[] } // optionally extend card with taskColumns
-  index: number
-  columnId: string
-  updateCard: (columnId: string, cardId: string, content: string, description?: string) => void
-  deleteCard: (columnId: string, cardId: string) => void
+  card: CardType & { taskColumns?: TaskColumnType[] }; // optionally extend card with taskColumns
+  index: number;
+  columnId: string;
+  updateCard: (
+    columnId: string,
+    cardId: string,
+    content: string,
+    description?: string
+  ) => void;
+  deleteCard: (columnId: string, cardId: string) => void;
 }
 
-export function Card({ card, index, columnId, updateCard, deleteCard }: CardProps) {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [editContent, setEditContent] = useState(card.content)
-  const [editDescription, setEditDescription] = useState(card.description || "")
+export function Card({
+  card,
+  index,
+  columnId,
+  updateCard,
+  deleteCard,
+}: CardProps) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editContent, setEditContent] = useState(card.content);
+  const [editDescription, setEditDescription] = useState(
+    card.description || ""
+  );
   // State to toggle display of nested task board inside modal
-  const [showTaskBoard, setShowTaskBoard] = useState(false)
+  const [showTaskBoard, setShowTaskBoard] = useState(false);
 
   const handleSaveEdit = () => {
-    if (!editContent.trim()) return
-    updateCard(columnId, card.id, editContent, editDescription)
-    setIsEditDialogOpen(false)
-  }
+    if (!editContent.trim()) return;
+    updateCard(columnId, card.id, editContent, editDescription);
+    setIsEditDialogOpen(false);
+  };
 
   const handleDelete = () => {
-    deleteCard(columnId, card.id)
-  }
+    deleteCard(columnId, card.id);
+  };
 
   const openEditDialog = () => {
-    setEditContent(card.content)
-    setEditDescription(card.description || "")
-    setIsEditDialogOpen(true)
-  }
+    setEditContent(card.content);
+    setEditDescription(card.description || "");
+    setIsEditDialogOpen(true);
+  };
 
   return (
     <>
@@ -94,7 +117,10 @@ export function Card({ card, index, columnId, updateCard, deleteCard }: CardProp
                     <Pencil className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
+                  <DropdownMenuItem
+                    className="text-red-600"
+                    onClick={handleDelete}
+                  >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete
                   </DropdownMenuItem>
@@ -106,7 +132,7 @@ export function Card({ card, index, columnId, updateCard, deleteCard }: CardProp
       </Draggable>
 
       {/* Modal dialog with edit fields and nested task board */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} >
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Card</DialogTitle>
@@ -131,7 +157,11 @@ export function Card({ card, index, columnId, updateCard, deleteCard }: CardProp
 
             {/* Button to toggle nested TaskBoard inside modal */}
             <div className="mt-2">
-              <Button variant="outline" size="sm" onClick={() => setShowTaskBoard(!showTaskBoard)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTaskBoard(!showTaskBoard)}
+              >
                 {showTaskBoard ? "Hide Tasks" : "Add Task"}
               </Button>
             </div>
@@ -150,5 +180,5 @@ export function Card({ card, index, columnId, updateCard, deleteCard }: CardProp
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
