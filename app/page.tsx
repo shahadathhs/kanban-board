@@ -1,4 +1,6 @@
-import { ProjectBoard } from "@/components/project-board";
+import ContentPlanner from "@/components/content/ContentPlanner";
+import { ContentPlannerProvider } from "@/components/content/ContentPlannerContext";
+import { ProjectBoard } from "@/components/kanban/project-board";
 
 export default function Home() {
   return (
@@ -9,6 +11,9 @@ export default function Home() {
         </h1>
         <ProjectBoard />
       </div>
+      <ContentPlannerProvider>
+        <ContentPlanner />
+      </ContentPlannerProvider>
     </div>
   );
 }

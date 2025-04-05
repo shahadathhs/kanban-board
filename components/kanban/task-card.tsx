@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { TaskCardType } from "./task-board";
 import { Draggable } from "@hello-pangea/dnd";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
 
 interface TaskCardProps {
   card: TaskCardType;
