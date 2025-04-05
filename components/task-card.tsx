@@ -1,41 +1,13 @@
-"use client";
-
 import { useState } from "react";
+import { TaskCardType } from "./task-board";
 import { Draggable } from "@hello-pangea/dnd";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
 
-import { CardType } from "./project-board";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-// Define types for nested tasks
-export type TaskCardType = {
-  id: string;
-  content: string;
-  description?: string;
-};
-
-export type TaskColumnType = {
-  id: string;
-  title: string;
-  cards: TaskCardType[];
-};
-
-interface CardProps {
-  card: CardType & { taskColumns?: TaskColumnType[] }; // optionally extend card with taskColumns
+interface TaskCardProps {
+  card: TaskCardType;
   index: number;
   columnId: string;
   updateCard: (
@@ -47,18 +19,10 @@ interface CardProps {
   deleteCard: (columnId: string, cardId: string) => void;
 }
 
-export function Card({
-  card,
-  index,
-  columnId,
-  updateCard,
-  deleteCard,
-}: CardProps) {
+export function TaskCard({ card, index, columnId, updateCard, deleteCard }: TaskCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editContent, setEditContent] = useState(card.content);
-  const [editDescription, setEditDescription] = useState(
-    card.description || ""
-  );
+  const [editDescription, setEditDescription] = useState(card.description || "");
 
   const handleSaveEdit = () => {
     if (!editContent.trim()) return;
@@ -70,12 +34,6 @@ export function Card({
     deleteCard(columnId, card.id);
   };
 
-  const openEditDialog = () => {
-    setEditContent(card.content);
-    setEditDescription(card.description || "");
-    setIsEditDialogOpen(true);
-  };
-
   return (
     <>
       <Draggable draggableId={card.id} index={index}>
@@ -84,77 +42,47 @@ export function Card({
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`p-3 mb-2 bg-white dark:bg-slate-950 rounded shadow-sm ${
-              snapshot.isDragging ? "opacity-70 shadow-md" : ""
-            } cursor-pointer`}
-            onClick={openEditDialog}
+            className={`p-2 bg-gray-100 dark:bg-gray-600 rounded text-xs mb-2 cursor-pointer ${
+              snapshot.isDragging ? "opacity-70" : ""
+            }`}
+            onClick={() => setIsEditDialogOpen(true)}
           >
-            <div className="flex justify-between items-start">
-              <div className="flex-1 mr-2">
-                <h3 className="font-medium text-sm">{card.content}</h3>
-                {card.description && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                    {card.description}
-                  </p>
-                )}
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={openEditDialog}>
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={handleDelete}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <div className="font-medium">{card.content}</div>
+            {card.description && (
+              <p className="text-xs text-gray-500 dark:text-gray-300">
+                {card.description}
+              </p>
+            )}
           </div>
         )}
       </Draggable>
 
-      {/* Modal dialog with edit fields and nested task board */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Card</DialogTitle>
+            <DialogTitle>Edit Task</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            {/* Edit fields */}
-            <div className="space-y-2">
-              <Input
-                placeholder="Card Title"
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-              />
+            <Input
+              placeholder="Task Title"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+            />
+            <Textarea
+              placeholder="Description (optional)"
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              rows={3}
+              className="text-xs"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" onClick={handleDelete}>
+                Delete
+              </Button>
+              <Button onClick={handleSaveEdit} size="sm">
+                Save Changes
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Textarea
-                placeholder="Description (optional)"
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                rows={3}
-              />
-            </div>
-
-            <Button onClick={handleSaveEdit} className="w-full">
-              Save Changes
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
